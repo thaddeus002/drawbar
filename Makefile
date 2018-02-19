@@ -10,4 +10,4 @@ yImage/libyImage.a:
 
 
 drawbar: drawbar.c yImage/libyImage.a
-	$(CC) -o drawbar $< -LyImage -lyImage
+	$(CC) -o drawbar $< -IyImage -LyImage -lyImage -lpng
