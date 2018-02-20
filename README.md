@@ -13,7 +13,7 @@ $ make install
 ## Create a progressbar
 
 ```shell
-$ ./drawbar 456 938
+$ drawbar 456 938
 ```
 
 Create the file `progressbar.png` :
