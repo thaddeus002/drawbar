@@ -15,19 +15,26 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "yImage.h"
 #include "yImage_io.h"
 #include "yText.h"
 
+#ifndef INSTALL_DIR
+/* the prefix assets installation */
+#define INSTALL_DIR "/usr"
+#endif
+
 // input images
-#define BACK   "share/empty.png"
-#define FIRST  "share/first.png"
-#define NORMAL "share/normal.png"
-#define LAST   "share/last.png"
+#define BACK   "empty.png"
+#define FIRST  "first.png"
+#define NORMAL "normal.png"
+#define LAST   "last.png"
 
 #define X_OFFSET 13
 #define Y_OFFSET 3
 #define BAR_LENGHT 200
+
 
 // generated file
 #define OUTPUT "progressbar.png"
@@ -46,7 +53,7 @@ void usage(char *prog) {
 /**
  * Draw on the bar to show the given index is reached.
  */
-void progressTo(int index, yImage *bar, yImage *first, yImage *normal, yImage *last) {
+void progress_to(int index, yImage *bar, yImage *first, yImage *normal, yImage *last) {
 
     yImage *progress = normal;
 
@@ -64,6 +71,24 @@ void progressTo(int index, yImage *bar, yImage *first, yImage *normal, yImage *l
 }
 
 
+
+yImage *read_file(const char *filename) {
+
+    yImage *im;
+    char *fullname = malloc(sizeof(char) * (strlen(filename) + strlen(INSTALL_DIR) + 20));
+
+    sprintf(fullname, "%s/share/drawbar/%s", INSTALL_DIR, filename);
+    im = y_load_png(fullname);
+    if(im == NULL) {
+        fprintf(stderr, "Could not read %s\n", fullname);
+    }
+
+    free(fullname);
+    return im;
+}
+
+
+
 /**
  * Create the output image.
  * \param rate the progression to show
@@ -76,30 +101,20 @@ yImage *create_bar(float rate) {
     int position;
     int i;
 
-    bar = y_load_png(BACK);
+    bar = read_file(BACK);
     if(bar == NULL) {
-        fprintf(stderr, "Could not read %s\n", BACK);
         return NULL;
     }
 
-    first = y_load_png(FIRST);
-    if(first == NULL) {
-        fprintf(stderr, "Could not read %s\n", FIRST);
-    }
+    first = read_file(FIRST);
 
-    normal = y_load_png(NORMAL);
-    if(normal == NULL) {
-        fprintf(stderr, "Could not read %s\n", NORMAL);
-    }
+    normal = read_file(NORMAL);
 
-    last = y_load_png(LAST);
-    if(last == NULL) {
-        fprintf(stderr, "Could not read %s\n", LAST);
-    }
+    last = read_file(LAST);
 
     position = (int) (rate * BAR_LENGHT);
     for(i=0; i<position; i++) {
-        progressTo(i, bar, first, normal, last);
+        progress_to(i, bar, first, normal, last);
     }
 
     return bar;
@@ -109,7 +124,7 @@ yImage *create_bar(float rate) {
 /**
  * \return the number of characters needed to write the given number
  */
-int numberChar(int value) {
+int number_char(int value) {
     int i = 0;
 
     if(value==0) return 1;
@@ -126,14 +141,14 @@ int numberChar(int value) {
 /**
  * Create the text to illustrate the progressbar.
  */
-yImage *createText(int n, int t, int height) {
+yImage *create_text(int n, int t, int height) {
 
     yImage *textImage;
     int nb = 0; // the number of caracters to write
     int err;
     char text[100];
 
-    nb = numberChar(n) + numberChar(t) + 3;
+    nb = number_char(n) + number_char(t) + 3;
 
     textImage = y_create_image(&err, NULL, nb*9+18, height);
     if(err) return NULL;
@@ -220,7 +235,7 @@ int main(int argc, char **argv) {
         height = bar->rgbHeight;
     }
 
-    textImage = createText(n, t, height);
+    textImage = create_text(n, t, height);
     progressBar = concat(bar, textImage);
 
     y_destroy_image(bar);
