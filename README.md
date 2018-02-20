@@ -6,6 +6,7 @@ Simple command line program to create a progress bar as an image.
 
 ```shell
 $ git clone --recurse-submodules https://github.com/thaddeus002/drawbar.git
+$ cd drawbar
 $ make
 ```
 
