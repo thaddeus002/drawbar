@@ -17,12 +17,20 @@ drawbar: drawbar.c yImage/libyImage.a
 	$(CC) -o drawbar $< -DINSTALL_DIR=\"$(PREFIX)\" -IyImage -LyImage -lyImage -lpng
 
 
-install: drawbar
+install: drawbar yImage/libyImage.a
+	PREFIX=$(PREFIX) make -C yImage install
 	install drawbar $(PREFIX)/bin
 	mkdir -p $(PREFIX)/share/drawbar
 	install -m 644 share/*.png $(PREFIX)/share/drawbar
 
-.PHONY: mrproper
+
+uninstall:
+	PREFIX=$(PREFIX) make -C yImage uninstall
+	rm -rf $(PREFIX)/share/drawbar
+	rm -f $(PREFIX)/bin/$(PROG)
+
+
+.PHONY: mrproper install uninstall
 
 mrproper:
 	make -C yImage mrproper
